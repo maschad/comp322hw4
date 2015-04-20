@@ -72,6 +72,10 @@ public:
 	Fraction operator+(const Fraction &f) const {
 		Fraction result(f.numerator,f.denominator);
 
+		if(result.numerator == 0 && result.denominator == 0){
+			throw 0;
+		}
+
 		if(this->denominator == f.denominator){
 			result.numerator += this->numerator;
 			return result;
@@ -114,6 +118,10 @@ public:
 
 		Fraction result(f.numerator,f.denominator);
 
+		if(result.denominator == 0){
+				throw 0;
+		}
+
 		if(this->denominator == f.denominator){
 			result.numerator = this->numerator - f.numerator;
 			return result;
@@ -122,6 +130,8 @@ public:
 			result.numerator = (numerator * f.denominator) - (denominator * f.numerator);
 			result.denominator = denominator * f.numerator;
 		}
+
+
 
 		return result;
 	}
@@ -134,6 +144,10 @@ public:
 		result.numerator = numerator * f.numerator;
 		result.denominator = denominator * f.denominator;
 
+		if(result.numerator == 0 && result.denominator == 0){
+			throw 0;
+		}
+
 		return result;
 
 	}
@@ -145,6 +159,10 @@ public:
 		result.numerator = numerator * f.denominator;
 		result.denominator = denominator * f.numerator;
 
+		if(result.denominator == 0){
+			throw 0;
+		}
+
 		return result;
 
 	}
@@ -152,13 +170,14 @@ public:
 	//-- compares the current fraction to f.
 	// * If both denominators are 0, return true (they are both infinity)
 	bool operator==(const Fraction &f) const {
-		if(f.denominator == denominator && f.numerator == f.numerator){
+
+		if(f.denominator == 0 && denominator == 0){
+			return true;
+		}
+		if(f.denominator == denominator && f.numerator == numerator){
 			return true;
 		}
 
-		if((f.numerator/f.denominator) == (numerator/denominator)){
-			return true;
-		}
 
 		return false;
 	}
