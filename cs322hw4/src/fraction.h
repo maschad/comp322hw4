@@ -43,7 +43,7 @@ public:
 		auto temp = this->numerator;
 		numerator = this->denominator;
 		this->denominator = temp;
-		return this;
+		return *this;
 
 	}
 
@@ -51,21 +51,23 @@ public:
 	Fraction &operator+=(const Fraction &f) {
 		if(this->denominator == f.denominator){
 			this->numerator+= f.numerator;
-			return *this;
 		}
 		else{
+			int tempNum, tempDenum;
+			tempNum = numerator;
+			tempDenum = denominator;
+			numerator = (tempNum * f.denominator) + (tempDenum * f.numerator);
+			denominator = tempDenum * f.denominator;
 
-			int tempNum,tempDenum;
-			tempNum = this->numerator;
-			this->numerator = this->numerator * f.denominator;
-			tempDenum = this->denominator;
-			this->denominator = this->denominator * f.numerator;
-
-			this->numerator += (f.numerator*tempDenum);
-			this->denominator += (f.denominator*tempDenum);
-
-			return *this;
 		}
+		if(numerator == denominator && numerator == 0){
+			throw 0;
+		} else if(denominator == 0) {
+			numerator = 1;
+		}else if(numerator == 0){
+			denominator = 1;
+		}
+		return *this;
 	}
 
 	//-- adds the fraction f to the current fraction a/b + c/d = (a*d + b*c) / (b*d) (don't simplify!)

@@ -6,34 +6,29 @@
 /* Question 2 : getting an approximation using the new Fraction class */
 
 Fraction<cf_int> ContinuedFraction::getApproximation(unsigned int k) const {
+	Fraction <cf_int> toRet(1,0);
+	stack<cf_int> ints;
 
-	Fraction<cf_int> toRet(1,0);
-	int tempNum = 0;
-
-	if(k == 0){
+	if(k==0){
 		throw k;
 	}
-	else{
-		stack<cf_int> ints;
 
-		while (!getIterator()->isDone() && k-- > 0) {
-			ints.push(getIterator()->next());
-		}
-
-		// do the math for adding an integer to a partial solution:
-		// x + 1 / (n / d) = x + d / n = (x*n + d) / n
-		while (!ints.empty()) {
-			cf_int x = ints.top();
-			cf_int n = toRet.getNumerator();
-			cf_int d = toRet.getDenominator();
-			tempNum = x * n + d;
-			ints.pop();
-		}
-		Fraction<cf_int> returnable(tempNum,toRet.getNumerator());
-
-		return returnable;
-
+	Iterator *it = getIterator();
+	while (!it->isDone() && k != 0) {
+		ints.push(it->next());
+		k--;
 	}
+
+	// do the math for adding an integer to a partial solution:
+	// x + 1 / (n / d) = x + d / n = (x*n + d) / n
+	while (!ints.empty()) {
+		Fraction<cf_int> toAdd(ints.top() , 1);
+		toRet.invert();
+		toRet += toAdd;
+		ints.pop();
+	}
+
+	return toRet;
 }
 
 
@@ -63,34 +58,22 @@ RationalCF::RationalCF(Fraction<cf_int> f) {
 /* Question 4 : PeriodicCF iterator*/
 
 Iterator *PeriodicCF::getIterator() const{
-
-	if(fixedPart.empty() && periodicPart.empty()){
-		PeriodicCF *cf = new PeriodicCF();
-		Iterator *toRet = new PeriodicCFIterator(*cf);
-		return toRet;
-	}
-	else{
-		PeriodicCF *cf = new PeriodicCF(fixedPart,periodicPart);
-		Iterator *toRet = new PeriodicCFIterator(*cf);
-		return toRet;
-	}
-
-
+	return new PeriodicCFIterator(*this);
 }
 
 cf_int PeriodicCFIterator::next() {
+
 	if(isDone()){
-		double toThrow = -1;
-		throw toThrow;
-	}else{
-		auto iteratorPosition = it; //save previous position
-		it ++; // increment previous position
-		if (it < cf.fixedPart.size()) { // if still in the fixed part
-			return cf.fixedPart[it];
-		}else { // if in the periodic part
-			auto positionInPeriodic = (it - cf.fixedPart.size()) % cf.periodicPart.size();
-			return cf.periodicPart[positionInPeriodic];
-		}
+		throw -1;
+	}
+
+	auto iteratorPosition = it; //save previous position
+	it++; // increment previous position
+	if (iteratorPosition < cf.fixedPart.size()) { // if still in the fixed part
+		return cf.fixedPart[iteratorPosition];
+	}else { // if in the periodic part
+		auto positionInPeriodic = (iteratorPosition - cf.fixedPart.size()) % cf.periodicPart.size();
+		return cf.periodicPart[positionInPeriodic];
 	}
 
 }
@@ -104,9 +87,7 @@ bool PeriodicCFIterator::isDone() const {
 /* Question 5 : MagicBoxCF iterator */
 
 Iterator *MagicBoxCF::getIterator() const {
-	Iterator *toRet = new MagicBoxCFIterator(toRet,a,b);
-	return toRet;
-
+	return new MagicBoxCFIterator(boxedFraction->getIterator(),a,b);
 }
 
 cf_int MagicBoxCFIterator::next() {
@@ -114,10 +95,19 @@ cf_int MagicBoxCFIterator::next() {
 		double toThrow = -1;
 		throw toThrow;
 	}
-	cf_int toRet;
-	toRet = boxedIterator->next();
+
+	 cf_int q = i / k;
+	    cf_int  ii = k,
+	            jj = l,
+	            kk = i - k * q,
+	            ll = j - l * q;
+	    i = ii;
+	    j = jj;
+	    k = kk;
+	    l = ll;
+
 	updateIndeces();
-	return toRet;
+	return q;
 
 }
 
@@ -129,9 +119,7 @@ bool MagicBoxCFIterator::isDone() const {
 /* Question 6 : Euler squared */
 
 Iterator *EulerSquared::getIterator() const {
-	Iterator *toRet = new EulerSquaredIterator();
-
-	return toRet;
+	return new EulerSquaredIterator();
 
 }
 
@@ -168,7 +156,7 @@ cf_int EulerSquaredIterator::next() {
 }
 
 bool EulerSquaredIterator::isDone() const {
-	return index >= 19;
+	return false;// never done
 }
 
 
