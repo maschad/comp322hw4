@@ -8,6 +8,7 @@
 
 #include <iostream>
 
+
 template<typename T>
 class Fraction {
 private:
@@ -15,7 +16,7 @@ private:
 	T denominator;
 
 	void update(T num, T den) {
-		if(num == 0 && den == 0) throw 0;
+		if(num == 0 && den == 0)throw 0;
 		else { denominator = den; numerator = num; }
 		if(num == 0) denominator = 1;
 		if(den == 0) numerator = 1;
@@ -39,8 +40,7 @@ public:
 
 	//-- inverts the fraction: swaps denominator and numerator
 	Fraction &invert() {
-		int temp;
-		temp = this->numerator;
+		auto temp = this->numerator;
 		numerator = this->denominator;
 		this->denominator = temp;
 		return this;
@@ -51,7 +51,7 @@ public:
 	Fraction &operator+=(const Fraction &f) {
 		if(this->denominator == f.denominator){
 			this->numerator+= f.numerator;
-			return this;
+			return *this;
 		}
 		else{
 
@@ -61,31 +61,25 @@ public:
 			tempDenum = this->denominator;
 			this->denominator = this->denominator * f.numerator;
 
-			this->numerator += (f.numerator*tempNum);
+			this->numerator += (f.numerator*tempDenum);
 			this->denominator += (f.denominator*tempDenum);
 
-			return this;
+			return *this;
 		}
 	}
 
 	//-- adds the fraction f to the current fraction a/b + c/d = (a*d + b*c) / (b*d) (don't simplify!)
 	Fraction operator+(const Fraction &f) const {
-		Fraction result;
+		Fraction result(f.numerator,f.denominator);
+
 		if(this->denominator == f.denominator){
-			result.numerator = this->numerator + f.numerator;
+			result.numerator += this->numerator;
 			return result;
 		}
 		else{
-			int tempNum,tempDenum;
-			tempNum = this->numerator;
-			tempDenum = this->denominator;
-			this->numerator = this->numerator * f.denominator;
-			this->denominator = this->denominator * f.numerator;
-			f.numerator = tempNum * f.numerator;
-			f.denominator = tempDenum * f.denominator;
 
-			result.numerator = f.numerator + this->numerator;
-			result.denominator = this->denominator;
+			result.numerator = (this->numerator * f.denominator) + (f.numerator * this->denominator);
+			result.denominator = this->denominator * f.denominator;
 
 			return result;
 
@@ -98,7 +92,7 @@ public:
 	Fraction &operator-=(const Fraction &f) {
 		if(this->denominator == f.denominator){
 			this->numerator-= f.numerator;
-			return this;
+			return *this;
 		}
 		else{
 
@@ -108,17 +102,17 @@ public:
 			tempDenum = this->denominator;
 			this->denominator = this->denominator * f.numerator;
 
-			this->numerator -= (f.numerator*tempNum);
+			this->numerator -= (f.numerator*tempDenum);
 			this->denominator -= (f.denominator*tempDenum);
 
-			return this;
+			return *this;
 		}
 	}
 
 	//-- subtracts the fraction f from the current fraction a/b - c/d = (a*d - b*c) / (b*d) (don't simplify!)
 	Fraction operator-(const Fraction &f) const {
 
-		Fraction result(f);
+		Fraction result(f.numerator,f.denominator);
 
 		if(this->denominator == f.denominator){
 			result.numerator = this->numerator - f.numerator;
@@ -135,7 +129,7 @@ public:
 	//-- multiplies the fraction f to the current fraction a/b * c/d = (a*c) / (b*d) (don't simplify!)
 	Fraction operator*(const Fraction &f) const {
 
-		Fraction result(f);
+		Fraction<T> result(f.numerator,f.denominator);
 
 		result.numerator = numerator * f.numerator;
 		result.denominator = denominator * f.denominator;
@@ -146,12 +140,12 @@ public:
 
 	//-- divides the current fraction by f: (a/b) / (c/d) = (a*d) / (b*c) (don't simplify!)
 	Fraction operator/(const Fraction &f) const {
-			Fraction result(f);
+		Fraction<T> result(f.numerator,f.denominator);
 
-			result.numerator = numerator * f.denominator;
-			result.denominator = denominator * f.numerator;
+		result.numerator = numerator * f.denominator;
+		result.denominator = denominator * f.numerator;
 
-			return result;
+		return result;
 
 	}
 
